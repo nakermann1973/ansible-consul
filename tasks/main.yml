@@ -6,30 +6,6 @@
                     from_json).get('tag_name') | replace('v', '') }}"
   when: 'consul_version == "latest"'
 
-- name: Install python dependencies
-  when: consul_install_dependencies | bool
-  block:
-    - name: Install netaddr dependency on controlling host (with --user)
-      pip:
-        name: netaddr
-        extra_args: --user
-      delegate_to: 127.0.0.1
-      become: false
-      vars:
-        ansible_become: false
-      run_once: true
-      when: not is_virtualenv or is_virtualenv == None
-
-    - name: Install netaddr dependency on controlling host (virtualenv)
-      pip:
-        name: netaddr
-      delegate_to: 127.0.0.1
-      become: false
-      vars:
-        ansible_become: false
-      run_once: true
-      when: is_virtualenv is defined
-
 - name: Include checks/asserts
   import_tasks: asserts.yml
 
