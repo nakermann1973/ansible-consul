@@ -16,9 +16,7 @@ jobs:
         scenario:
           - almalinux-8
           - almalinux-9
-          - centos-stream-8
           - centos-stream-9
-          - debian-10
           - debian-11
           - fedora-37
           - fedora-38
@@ -32,13 +30,11 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          path: "${{ github.repository }}"
+        uses: actions/checkout@v4
 
       - name: Molecule
-        uses: gofrolist/molecule-action@v2.3.13
+        uses: gofrolist/molecule-action@v2.7.6
         with:
           molecule_options: --base-config molecule/_shared/base.yml
           molecule_args: --scenario-name ${{ matrix.scenario }}
-          molecule_working_dir: "ansible-community/ansible-consul"
+          molecule_working_dir: ansible-community/ansible-consul
