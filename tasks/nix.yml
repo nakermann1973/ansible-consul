@@ -109,6 +109,7 @@
         ansible_become: false
       run_once: true
       changed_when: false
+      check_mode: false
       register: consul_raw_key_file
 
     # Key provided by extra vars or the above block
@@ -123,6 +124,7 @@
       delegate_to: localhost
       run_once: true
       changed_when: false
+      check_mode: false
       when: consul_raw_key is defined
 
     - name: Generate new gossip encryption key if none was found
@@ -135,6 +137,7 @@
           become: false
           tempfile:
             state: file
+          check_mode: false
           register: gossip_key_tempfile
 
         - name: Generate gossip encryption key
@@ -154,13 +157,14 @@
           file:
             path: "{{ gossip_key_tempfile.path }}"
             state: absent
-          when: gossip_key_tempfile is defined
+          check_mode: false
+          when: gossip_key_tempfile is defined and gossip_key_tempfile.path is defined
 
     - name: Read gossip encryption key for servers that require it
       set_fact:
         consul_raw_key: "{{ lookup('file', consul_raw_key_file.path) }}"
       no_log: true
-      when: consul_raw_key is not defined
+      when: consul_raw_key is not defined and consul_raw_key_file.path is defined
 
     - name: Delete gossip encryption key file
       file:
@@ -172,6 +176,8 @@
       run_once: true
       delegate_to: localhost
       changed_when: false
+      check_mode: false
+      when: consul_raw_key_file is defined and consul_raw_key_file.path is defined
 
 - name: Create ACL configuration
   include_tasks: acl.yml
